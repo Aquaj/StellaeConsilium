@@ -25,6 +25,18 @@ class GameUtil
 	}
 
 	/**
+	 * Retourne la distance entre deux Planete en appelant getDistanceBetween()
+	 * @param	p1
+	 * @param	p2
+	 * @return
+	 */
+	public static function getDistanceBetweenPlanets(p1:Planet, p2:Planet) : Float
+	{
+		return getDistanceBetween(new Point(p1.x, p1.y), new Point(p2.x, p2.y));
+	}
+
+
+	/**
 	 * Retourne le nombre de tour necessaire pour voyager entre deux Planet
 	 * @param	source : La planete de depart
 	 * @param	target : La planete d'arrivée
@@ -32,9 +44,10 @@ class GameUtil
 	 */
 	public static function getTravelNumTurn(source:Planet, target:Planet) : Int
 	{
-		return Math.ceil(GameUtil.getDistanceBetween(new Point(source.x, source.y), new Point(target.x, target.y)) / Game.SHIP_SPEED);
+		return Math.ceil(getDistanceBetween(new Point(source.x, source.y), new Point(target.x, target.y)) / Game.SHIP_SPEED);
 	}
 	
+
 	/**
 	 * Retourne la liste des planetes controlées par un joueur
 	 * @param	planetOwnerId : le proprietaire
@@ -94,6 +107,49 @@ class GameUtil
 			if(ship.owner.id != playerId)
 				result.push(ship);
 		return result;
+	}
+
+	/**
+	 * Retourne la planete la plus proche de soi dans une liste de candidats
+	 * @param	source : la planete reference
+	 * @param	candidats : la liste des planetes a etudier
+	 * @return
+	 */
+	public static function getNearestPlanet(source:Planet, candidats:Array<Planet>) : Planet
+	{
+		var result			= candidats[0];
+		var currentDist 	= getDistanceBetweenPlanets(source, result);
+		for (i in 0...candidats.length)
+		{
+			var element = candidats[i];
+			if (currentDist > getDistanceBetweenPlanets(source, element))
+			{
+				currentDist = getDistanceBetweenPlanets(source, element);
+				result = element;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Part du principe qu'au debut de la partie l'ennemi n'a qu'une seule planete
+	 * alors qu'il y a plusieurs neutres et s'en sert pour trouver son nom.
+	 * Ne marche donc que dans les premiers tours.
+	 *
+	 * @param	others : la liste des planetes a etudier (ne contient pas nos planetes)
+	 * @return	IPlayer : Retourne l'utilisateur le plus probable d'etre l'ennemi en vérifiant 
+	 * le nombre de planetes de chacun.
+	 */
+	public static function getEnnemyName(others:Array<Planet>) : IPlayer
+	{
+		//checks who is the enemy with the lesser number of planets
+		//and assumes it is the opposite AI
+		//						( works only for the first few turns)
+		var first:IPlayer = others[0].owner;
+		var second:IPlayer = others[1].owner;
+		
+		return (first == others[others.length-1].owner) ? second : first;
 	}
 
 	/**

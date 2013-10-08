@@ -5,7 +5,6 @@ import com.tamina.planetwars.data.Galaxy;
 import com.tamina.planetwars.data.Order;
 import com.tamina.planetwars.data.Planet;
 import com.tamina.planetwars.utils.GameUtil;
-import strategy.StrategyUtils;
 
 class Germany implements Strategy
 {
@@ -31,14 +30,14 @@ class Germany implements Strategy
 		var otherPlanets = GameUtil.getEnemyPlanets(id, context);
 
 		if (ennemy == null)					//allows a single initialization
-			ennemy = StrategyUtils.getEnnemyName(otherPlanets);
+			ennemy = GameUtil.getEnnemyName(otherPlanets);
 		var ennemyPlanets = GameUtil.getPlayerPlanets(ennemy.id, context);
 
 		if (otherPlanets != null && otherPlanets.length > 0)
 		{
 			for (myPlanet in myPlanets)
 			{
-				var target = StrategyUtils.getNearestPlanet(myPlanet, otherPlanets);
+				var target = GameUtil.getNearestPlanet(myPlanet, otherPlanets);
 
 				if (myPlanet.population >= this.level)
 					result.push(new Order(myPlanet.id, target.id, this.quant));

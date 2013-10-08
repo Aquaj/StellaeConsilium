@@ -265,6 +265,9 @@ com.tamina.planetwars.utils.GameUtil.__name__ = true;
 com.tamina.planetwars.utils.GameUtil.getDistanceBetween = function(p1,p2) {
 	return Math.sqrt(Math.pow(p2.x - p1.x,2) + Math.pow(p2.y - p1.y,2));
 }
+com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets = function(p1,p2) {
+	return com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(p1.x,p1.y),new com.tamina.planetwars.geom.Point(p2.x,p2.y));
+}
 com.tamina.planetwars.utils.GameUtil.getTravelNumTurn = function(source,target) {
 	return Math.ceil(com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(target.x,target.y)) / 60);
 }
@@ -307,6 +310,25 @@ com.tamina.planetwars.utils.GameUtil.getEnemyShips = function(playerId,context) 
 		if(ship.owner.id != playerId) result.push(ship);
 	}
 	return result;
+}
+com.tamina.planetwars.utils.GameUtil.getNearestPlanet = function(source,candidats) {
+	var result = candidats[0];
+	var currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,result);
+	var _g1 = 0, _g = candidats.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var element = candidats[i];
+		if(currentDist > com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,element)) {
+			currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,element);
+			result = element;
+		}
+	}
+	return result;
+}
+com.tamina.planetwars.utils.GameUtil.getEnnemyName = function(others) {
+	var first = others[0].owner;
+	var second = others[1].owner;
+	return first == others[others.length - 1].owner?second:first;
 }
 com.tamina.planetwars.utils.GameUtil.createRandomGalaxy = function(width,height,padding,playerOne,playerTwo) {
 	var result = new com.tamina.planetwars.data.Galaxy(width,height);
@@ -440,14 +462,14 @@ strategy.Germany.prototype = {
 		var result = new Array();
 		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
 		var otherPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
-		if(this.ennemy == null) this.ennemy = strategy.StrategyUtils.getEnnemyName(otherPlanets);
+		if(this.ennemy == null) this.ennemy = com.tamina.planetwars.utils.GameUtil.getEnnemyName(otherPlanets);
 		var ennemyPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(this.ennemy.id,context);
 		if(otherPlanets != null && otherPlanets.length > 0) {
 			var _g = 0;
 			while(_g < myPlanets.length) {
 				var myPlanet = myPlanets[_g];
 				++_g;
-				var target = strategy.StrategyUtils.getNearestPlanet(myPlanet,otherPlanets);
+				var target = com.tamina.planetwars.utils.GameUtil.getNearestPlanet(myPlanet,otherPlanets);
 				if(myPlanet.population >= this.level) result.push(new com.tamina.planetwars.data.Order(myPlanet.id,target.id,this.quant));
 			}
 		}
@@ -513,7 +535,7 @@ strategy.StraightToCore.prototype = {
 		var result = new Array();
 		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
 		var otherPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
-		if(this.ennemy == null) this.ennemy = strategy.StrategyUtils.getEnnemyName(otherPlanets);
+		if(this.ennemy == null) this.ennemy = com.tamina.planetwars.utils.GameUtil.getEnnemyName(otherPlanets);
 		var ennemyPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(this.ennemy.id,context);
 		if(ennemyPlanets != null && ennemyPlanets.length > 0) {
 			var _g = 0;
@@ -526,27 +548,6 @@ strategy.StraightToCore.prototype = {
 		}
 		return result;
 	}
-}
-strategy.StrategyUtils = function() { }
-strategy.StrategyUtils.__name__ = true;
-strategy.StrategyUtils.getNearestPlanet = function(source,candidats) {
-	var result = candidats[0];
-	var currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(result.x,result.y));
-	var _g1 = 0, _g = candidats.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		var element = candidats[i];
-		if(currentDist > com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(element.x,element.y))) {
-			currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(element.x,element.y));
-			result = element;
-		}
-	}
-	return result;
-}
-strategy.StrategyUtils.getEnnemyName = function(candidats) {
-	var first = candidats[0].owner;
-	var second = candidats[1].owner;
-	return first == candidats[candidats.length - 1].owner?second:first;
 }
 Math.__name__ = ["Math"];
 Math.NaN = Number.NaN;

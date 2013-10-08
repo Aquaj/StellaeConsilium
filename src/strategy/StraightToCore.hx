@@ -29,7 +29,7 @@ class StraightToCore implements Strategy
 		var otherPlanets = GameUtil.getEnemyPlanets(id, context);
 		
 		if (ennemy == null)					//allows a single initialization
-			ennemy = StrategyUtils.getEnnemyName(otherPlanets);
+			ennemy = GameUtil.getEnnemyName(otherPlanets);
 
 		var ennemyPlanets = GameUtil.getPlayerPlanets(ennemy.id, context);
 
