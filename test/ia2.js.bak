@@ -49,7 +49,7 @@ MyIA.prototype = $extend(WorkerIA.prototype,{
 		return this.strat.getOrders(context,this.id);
 	}
 	,strategy: function() {
-		return new strategy.Spread(this);
+		return new strategy.Germany(66);
 	}
 });
 var Std = function() { }
@@ -313,22 +313,22 @@ com.tamina.planetwars.utils.GameUtil.getEnemyShips = function(playerId,context) 
 }
 com.tamina.planetwars.utils.GameUtil.getNearestPlanet = function(source,candidats) {
 	var result = candidats[0];
-	var currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(result.x,result.y));
+	var currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,result);
 	var _g1 = 0, _g = candidats.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		var element = candidats[i];
-		if(currentDist > com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(element.x,element.y))) {
-			currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(element.x,element.y));
+		if(currentDist > com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,element)) {
+			currentDist = com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(source,element);
 			result = element;
 		}
 	}
 	return result;
 }
-com.tamina.planetwars.utils.GameUtil.getEnnemyName = function(candidats) {
-	var first = candidats[0].owner;
-	var second = candidats[1].owner;
-	return first == candidats[candidats.length - 1].owner?second:first;
+com.tamina.planetwars.utils.GameUtil.getEnnemyName = function(others) {
+	var first = others[0].owner;
+	var second = others[1].owner;
+	return first == others[others.length - 1].owner?second:first;
 }
 com.tamina.planetwars.utils.GameUtil.createRandomGalaxy = function(width,height,padding,playerOne,playerTwo) {
 	var result = new com.tamina.planetwars.data.Galaxy(width,height);
@@ -462,8 +462,6 @@ strategy.Germany.prototype = {
 		var result = new Array();
 		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
 		var otherPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
-		if(this.ennemy == null) this.ennemy = com.tamina.planetwars.utils.GameUtil.getEnnemyName(otherPlanets);
-		var ennemyPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(this.ennemy.id,context);
 		if(otherPlanets != null && otherPlanets.length > 0) {
 			var _g = 0;
 			while(_g < myPlanets.length) {
@@ -506,7 +504,7 @@ strategy.Spread.prototype = {
 			if(source[0].population == com.tamina.planetwars.data.PlanetPopulation.getMaxPopulation(source[0].size)) {
 				enemyPlanets.sort((function(source) {
 					return function(a,b) {
-						return com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(a.x,a.y),new com.tamina.planetwars.geom.Point(source[0].x,source[0].y)) - com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(b.x,b.y),new com.tamina.planetwars.geom.Point(source[0].x,source[0].y)) | 0;
+						return com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(a,source[0]) - com.tamina.planetwars.utils.GameUtil.getDistanceBetweenPlanets(b,source[0]) | 0;
 					};
 				})(source));
 				var _g1 = 0;

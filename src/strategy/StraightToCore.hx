@@ -13,11 +13,13 @@ class StraightToCore implements Strategy
 	//sends a percent (default 100) of resources form all
 	//planets onto a single ennemy planet.
 
-	private var ennemy:IPlayer; 			//avoid problem of turns (see StrategyUtils.getEnnemyName)
-	private var percent:Int;					//how many of planets' pop. we send to conquest
+	private var ennemy	: IPlayer; 			//avoid problem of turns (see StrategyUtils.getEnnemyName)
+	private var percent	: Int;					//how many of planets' pop. we send to conquest
+	private var ia 		: MyIA;
 
-	public function new(percentage: Int = 100)
+	public function new(ia : MyIA, percentage: Int = 100)
 	{
+		this.ia = ia;
 		this.percent = percentage;
 	}
 

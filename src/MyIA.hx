@@ -8,6 +8,7 @@ import strategy.Strategy;
 import strategy.StraightToCore;
 import strategy.Germany;
 import strategy.Spread;
+import strategy.Expand;
 
 /**
  * IA Base class that just allows the Strategy classes to be run.
@@ -15,11 +16,11 @@ import strategy.Spread;
 
 class MyIA extends WorkerIA
 {
-	private var strat:Strategy;
+	public var strat:Strategy;
 
 	private function strategy() : Strategy
 	{
-		return new Spread(this);	//points to strategy to use
+		return new Germany(this);	//points to strategy to use
 	}
 
 	public static function main() : Void

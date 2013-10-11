@@ -1,6 +1,5 @@
 package strategy;
 
-import com.tamina.planetwars.data.IPlayer;
 import com.tamina.planetwars.data.Galaxy;
 import com.tamina.planetwars.data.Order;
 import com.tamina.planetwars.data.Planet;
@@ -10,12 +9,13 @@ class Germany implements Strategy
 {
 	private var level : Int;
 	private var quant : Int;
-	private var ennemy : IPlayer; 			//avoid problem of turns (see StrategyUtils.getEnnemyName)
+	private var ia : MyIA; 
 
-	public function new(level : Int = 50, quant : Int = 40)
+	public function new(ia : MyIA, level : Int = 50, quant : Int = 40)
 	{
-		this.level = level;
-		this.quant = quant;
+		this.ia		= ia;
+		this.level 	= level;
+		this.quant 	= quant;
 	}
 
 	public function getOrders(context : Galaxy, id:String) : Array<Order>
@@ -29,9 +29,10 @@ class Germany implements Strategy
 		var myPlanets = GameUtil.getPlayerPlanets(id, context);	
 		var otherPlanets = GameUtil.getEnemyPlanets(id, context);
 
-		if (ennemy == null)					//allows a single initialization
-			ennemy = GameUtil.getEnnemyName(otherPlanets);
-		var ennemyPlanets = GameUtil.getPlayerPlanets(ennemy.id, context);
+#if MULTISTRAT
+		if (myPlanets.length >= 3)
+			this.ia.strat = new Expand(this.ia);
+#end
 
 		if (otherPlanets != null && otherPlanets.length > 0)
 		{

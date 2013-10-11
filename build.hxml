@@ -2,6 +2,8 @@
 -cp src
 -main MyIA
 
+#-D MULTISTRAT #launch a few "if (cond) then switch strategy" statements
+
 #for windows
 #-cmd "move /Y test\ia1.js test\ia1.js.bak"
 #-cmd "move /Y test\ia2.js test\ia2.js.bak"

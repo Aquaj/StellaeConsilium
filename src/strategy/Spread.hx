@@ -34,7 +34,7 @@ class Spread implements Strategy
 			if(source.population == PlanetPopulation.getMaxPopulation(source.size))
 			{
 				// Sort planets by distance from source
-				enemyPlanets.sort(function(a : Planet, b : Planet) : Int { return Std.int(GameUtil.getDistanceBetween(new Point(a.x, a.y), new Point(source.x, source.y)) - GameUtil.getDistanceBetween(new Point(b.x, b.y), new Point(source.x, source.y))); });
+				enemyPlanets.sort(function(a : Planet, b : Planet) : Int { return Std.int(GameUtil.getDistanceBetweenPlanets(a, source) - GameUtil.getDistanceBetweenPlanets(b, source)); });
 
 				for(target in enemyPlanets)
 				{
