@@ -11,7 +11,8 @@
 #-cmd "copy /Y ia.js test\ia2.js"
 
 #else
--cmd "mv test/ia1.js test/ia1.js.bak"
+#-cmd "mv test/ia1.js test/ia1.js.bak"
 -cmd "mv test/ia2.js test/ia2.js.bak"
--cmd "cp ia.js test/ia1.js"
--cmd "cp ia.js test/ia2.js"
+#-cmd "cp ia.js test/ia1.js"
+-cmd "cp ia.js test/ia2.js" 
+-cmd "firefox test/index.html"

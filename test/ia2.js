@@ -19,12 +19,24 @@ HxOverrides.remove = function(a,obj) {
 	}
 	return false;
 }
+HxOverrides.iter = function(a) {
+	return { cur : 0, arr : a, hasNext : function() {
+		return this.cur < this.arr.length;
+	}, next : function() {
+		return this.arr[this.cur++];
+	}};
+}
+var IMap = function() { }
+IMap.__name__ = true;
 var com = {}
 com.tamina = {}
 com.tamina.planetwars = {}
 com.tamina.planetwars.data = {}
 com.tamina.planetwars.data.IPlayer = function() { }
 com.tamina.planetwars.data.IPlayer.__name__ = true;
+com.tamina.planetwars.data.IPlayer.prototype = {
+	__class__: com.tamina.planetwars.data.IPlayer
+}
 var WorkerIA = function(name,color) {
 	if(color == null) color = 0;
 	if(name == null) name = "";
@@ -48,10 +60,12 @@ WorkerIA.prototype = {
 		var result = new Array();
 		return result;
 	}
+	,__class__: WorkerIA
 }
 var MyIA = function() {
-	WorkerIA.call(this,"Stellea#1",8447);
-	this.strat = this.strategy();
+	this.strategies = [new strategy.StraightToCore(this),new strategy.Germany(this),new strategy.Spread(this),new strategy.Expand(this),new strategy.Random(this),new strategy.Focus(this)];
+	WorkerIA.call(this,"Stellae#1",8447);
+	this.strat = 5;
 };
 MyIA.__name__ = true;
 MyIA.main = function() {
@@ -60,16 +74,17 @@ MyIA.main = function() {
 MyIA.__super__ = WorkerIA;
 MyIA.prototype = $extend(WorkerIA.prototype,{
 	getOrders: function(context) {
-		return this.strat.getOrders(context,this.id);
+		return this.strategies[this.strat].getOrders(context,this.id);
 	}
-	,strategy: function() {
-		return new strategy.Germany(this);
-	}
+	,__class__: MyIA
 });
 var Std = function() { }
 Std.__name__ = true;
 Std.string = function(s) {
 	return js.Boot.__string_rec(s,"");
+}
+Std.random = function(x) {
+	return x <= 0?0:Math.floor(Math.random() * x);
 }
 com.tamina.planetwars.data.Galaxy = function(width,height) {
 	this.width = width;
@@ -91,6 +106,7 @@ com.tamina.planetwars.data.Galaxy.prototype = {
 		}
 		return result;
 	}
+	,__class__: com.tamina.planetwars.data.Galaxy
 }
 com.tamina.planetwars.data.Game = function() { }
 com.tamina.planetwars.data.Game.__name__ = true;
@@ -108,6 +124,9 @@ com.tamina.planetwars.data.Order = function(sourceID,targetID,numUnits) {
 	this.numUnits = numUnits;
 };
 com.tamina.planetwars.data.Order.__name__ = true;
+com.tamina.planetwars.data.Order.prototype = {
+	__class__: com.tamina.planetwars.data.Order
+}
 com.tamina.planetwars.data.Planet = function(x,y,size,owner) {
 	if(size == null) size = 2;
 	if(y == null) y = 0;
@@ -121,10 +140,7 @@ com.tamina.planetwars.data.Planet = function(x,y,size,owner) {
 };
 com.tamina.planetwars.data.Planet.__name__ = true;
 com.tamina.planetwars.data.Planet.prototype = {
-	toString: function() {
-		var str = "Hello boys";
-		return str;
-	}
+	__class__: com.tamina.planetwars.data.Planet
 }
 com.tamina.planetwars.data.PlanetPopulation = function() { }
 com.tamina.planetwars.data.PlanetPopulation.__name__ = true;
@@ -244,6 +260,7 @@ com.tamina.planetwars.data.Player.prototype = {
 		var result = new Array();
 		return result;
 	}
+	,__class__: com.tamina.planetwars.data.Player
 }
 com.tamina.planetwars.data.Range = function(from,to) {
 	if(to == null) to = 1;
@@ -252,6 +269,9 @@ com.tamina.planetwars.data.Range = function(from,to) {
 	this.to = to;
 };
 com.tamina.planetwars.data.Range.__name__ = true;
+com.tamina.planetwars.data.Range.prototype = {
+	__class__: com.tamina.planetwars.data.Range
+}
 com.tamina.planetwars.data.Ship = function(crew,source,target,creationTurn) {
 	this.crew = crew;
 	this.source = source;
@@ -261,11 +281,17 @@ com.tamina.planetwars.data.Ship = function(crew,source,target,creationTurn) {
 	this.travelDuration = Math.ceil(com.tamina.planetwars.utils.GameUtil.getDistanceBetween(new com.tamina.planetwars.geom.Point(source.x,source.y),new com.tamina.planetwars.geom.Point(target.x,target.y)) / 60);
 };
 com.tamina.planetwars.data.Ship.__name__ = true;
+com.tamina.planetwars.data.Ship.prototype = {
+	__class__: com.tamina.planetwars.data.Ship
+}
 com.tamina.planetwars.data.TurnMessage = function(playerId,galaxy) {
 	this.playerId = playerId;
 	this.galaxy = galaxy;
 };
 com.tamina.planetwars.data.TurnMessage.__name__ = true;
+com.tamina.planetwars.data.TurnMessage.prototype = {
+	__class__: com.tamina.planetwars.data.TurnMessage
+}
 com.tamina.planetwars.data.TurnResult = function(orders,message) {
 	if(message == null) message = "";
 	this.orders = orders;
@@ -273,12 +299,18 @@ com.tamina.planetwars.data.TurnResult = function(orders,message) {
 	this.error = "";
 };
 com.tamina.planetwars.data.TurnResult.__name__ = true;
+com.tamina.planetwars.data.TurnResult.prototype = {
+	__class__: com.tamina.planetwars.data.TurnResult
+}
 com.tamina.planetwars.geom = {}
 com.tamina.planetwars.geom.Point = function(x,y) {
 	this.x = x;
 	this.y = y;
 };
 com.tamina.planetwars.geom.Point.__name__ = true;
+com.tamina.planetwars.geom.Point.prototype = {
+	__class__: com.tamina.planetwars.geom.Point
+}
 com.tamina.planetwars.utils = {}
 com.tamina.planetwars.utils.GameUtil = function() { }
 com.tamina.planetwars.utils.GameUtil.__name__ = true;
@@ -397,6 +429,29 @@ com.tamina.planetwars.utils.UID.get = function() {
 	com.tamina.planetwars.utils.UID._lastUID++;
 	return com.tamina.planetwars.utils.UID._lastUID;
 }
+var haxe = {}
+haxe.ds = {}
+haxe.ds.ObjectMap = function() {
+	this.h = { };
+	this.h.__keys__ = { };
+};
+haxe.ds.ObjectMap.__name__ = true;
+haxe.ds.ObjectMap.__interfaces__ = [IMap];
+haxe.ds.ObjectMap.prototype = {
+	keys: function() {
+		var a = [];
+		for( var key in this.h.__keys__ ) {
+		if(this.h.hasOwnProperty(key)) a.push(this.h.__keys__[key]);
+		}
+		return HxOverrides.iter(a);
+	}
+	,set: function(key,value) {
+		var id = key.__id__ != null?key.__id__:key.__id__ = ++haxe.ds.ObjectMap.count;
+		this.h[id] = value;
+		this.h.__keys__[id] = key;
+	}
+	,__class__: haxe.ds.ObjectMap
+}
 var js = {}
 js.Boot = function() { }
 js.Boot.__name__ = true;
@@ -466,9 +521,54 @@ js.Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 }
+js.Boot.__interfLoop = function(cc,cl) {
+	if(cc == null) return false;
+	if(cc == cl) return true;
+	var intf = cc.__interfaces__;
+	if(intf != null) {
+		var _g1 = 0, _g = intf.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var i1 = intf[i];
+			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
+		}
+	}
+	return js.Boot.__interfLoop(cc.__super__,cl);
+}
+js.Boot.__instanceof = function(o,cl) {
+	if(cl == null) return false;
+	switch(cl) {
+	case Int:
+		return (o|0) === o;
+	case Float:
+		return typeof(o) == "number";
+	case Bool:
+		return typeof(o) == "boolean";
+	case String:
+		return typeof(o) == "string";
+	case Dynamic:
+		return true;
+	default:
+		if(o != null) {
+			if(typeof(cl) == "function") {
+				if(o instanceof cl) {
+					if(cl == Array) return o.__enum__ == null;
+					return true;
+				}
+				if(js.Boot.__interfLoop(o.__class__,cl)) return true;
+			}
+		} else return false;
+		if(cl == Class && o.__name__ != null) return true;
+		if(cl == Enum && o.__ename__ != null) return true;
+		return o.__enum__ == cl;
+	}
+}
 var strategy = {}
 strategy.Strategy = function() { }
 strategy.Strategy.__name__ = true;
+strategy.Strategy.prototype = {
+	__class__: strategy.Strategy
+}
 strategy.Expand = function(ia,distance,marge,level) {
 	if(level == null) level = 30;
 	if(marge == null) marge = 100;
@@ -495,7 +595,6 @@ strategy.Expand.prototype = {
 		var result = new Array();
 		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
 		var otherPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
-		if(myPlanets.length < 3) this.ia.strat = new strategy.StraightToCore(this.ia);
 		if(otherPlanets != null && otherPlanets.length > 0) {
 			var _g = 0;
 			while(_g < myPlanets.length) {
@@ -562,6 +661,107 @@ strategy.Expand.prototype = {
 		}
 		return result;
 	}
+	,__class__: strategy.Expand
+}
+strategy.Focus = function(ia) {
+	this.ia = ia;
+	this.PlanetsData = new haxe.ds.ObjectMap();
+};
+strategy.Focus.__name__ = true;
+strategy.Focus.__interfaces__ = [strategy.Strategy];
+strategy.Focus.prototype = {
+	createOrders: function(data) {
+		var orders = new Array();
+		var dataTuple;
+		var $it0 = data.keys();
+		while( $it0.hasNext() ) {
+			var planet = $it0.next();
+			dataTuple = data.h[planet.__id__];
+			var _g1 = 0, _g = data.h[planet.__id__].getTargets().length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(dataTuple.getTurnsLeft()[i] == 0) {
+					orders.push(new com.tamina.planetwars.data.Order(planet.id,dataTuple.getTargets()[i].id,dataTuple.getPopReserved()[i]));
+					dataTuple.remove(i);
+				}
+			}
+			dataTuple.decrease();
+		}
+		return orders;
+	}
+	,canConquer: function(source,target) {
+		return target.population + com.tamina.planetwars.utils.GameUtil.getTravelNumTurn(source,target) * 5 < this.PlanetsData.h[source.__id__].getPopLeft();
+	}
+	,getOrders: function(context,id) {
+		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
+		var enemyPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
+		var enemyShips = com.tamina.planetwars.utils.GameUtil.getEnemyShips(id,context);
+		var toSend = new Array();
+		var _g = 0;
+		while(_g < myPlanets.length) {
+			var planet = myPlanets[_g];
+			++_g;
+			if(!this.PlanetsData.h.hasOwnProperty(planet.__id__)) this.PlanetsData.set(planet,new strategy.DataPlanet(planet.population));
+		}
+		var _g = 0;
+		while(_g < myPlanets.length) {
+			var myPlanet = myPlanets[_g];
+			++_g;
+			var plan = 0;
+			var _g1 = 0;
+			while(_g1 < enemyPlanets.length) {
+				var enemyPlanet = enemyPlanets[_g1];
+				++_g1;
+				if(this.canConquer(myPlanet,enemyPlanet)) {
+					var popByLanding = enemyPlanet.population + com.tamina.planetwars.utils.GameUtil.getTravelNumTurn(myPlanet,enemyPlanet) * 5;
+					this.PlanetsData.h[myPlanet.__id__].updateData(enemyPlanet,popByLanding + 1,0);
+				}
+			}
+		}
+		return this.createOrders(this.PlanetsData);
+	}
+	,__class__: strategy.Focus
+}
+strategy.DataPlanet = function(pop) {
+	this.targets = new Array();
+	this.popReserved = new Array();
+	this.turnsLeft = new Array();
+	this.popLeft = pop;
+};
+strategy.DataPlanet.__name__ = true;
+strategy.DataPlanet.prototype = {
+	decrease: function() {
+		var _g = 0, _g1 = this.turnsLeft;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			i--;
+		}
+	}
+	,remove: function(order) {
+		this.targets.splice(order,1);
+		this.popReserved.splice(order,1);
+		this.turnsLeft.splice(order,1);
+	}
+	,getPopLeft: function() {
+		return this.popLeft;
+	}
+	,getTurnsLeft: function() {
+		return this.turnsLeft;
+	}
+	,getPopReserved: function() {
+		return this.popReserved;
+	}
+	,getTargets: function() {
+		return this.targets;
+	}
+	,updateData: function(target,pop,turns) {
+		this.targets.push(target);
+		this.popReserved.push(pop);
+		this.turnsLeft.push(turns);
+		this.popLeft -= pop;
+	}
+	,__class__: strategy.DataPlanet
 }
 strategy.Germany = function(ia,level,quant) {
 	if(quant == null) quant = 40;
@@ -577,7 +777,6 @@ strategy.Germany.prototype = {
 		var result = new Array();
 		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
 		var otherPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
-		if(myPlanets.length >= 3) this.ia.strat = new strategy.Expand(this.ia);
 		if(otherPlanets != null && otherPlanets.length > 0) {
 			var _g = 0;
 			while(_g < myPlanets.length) {
@@ -589,6 +788,51 @@ strategy.Germany.prototype = {
 		}
 		return result;
 	}
+	,__class__: strategy.Germany
+}
+strategy.Random = function(ia) {
+	this.ia = ia;
+};
+strategy.Random.__name__ = true;
+strategy.Random.__interfaces__ = [strategy.Strategy];
+strategy.Random.prototype = {
+	getOrders: function(context,id) {
+		var orders = new Array();
+		var myPlanets = com.tamina.planetwars.utils.GameUtil.getPlayerPlanets(id,context);
+		var myShips = com.tamina.planetwars.utils.GameUtil.getPlayerShips(id,context);
+		var enemyPlanets = com.tamina.planetwars.utils.GameUtil.getEnemyPlanets(id,context);
+		var enemyShips = com.tamina.planetwars.utils.GameUtil.getEnemyShips(id,context);
+		var toSend = new Array();
+		var _g1 = 0, _g = enemyPlanets.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			toSend.push(0);
+		}
+		var totalPopulation = 0;
+		var _g = 0;
+		while(_g < myPlanets.length) {
+			var planet = myPlanets[_g];
+			++_g;
+			totalPopulation += planet.population;
+		}
+		var _g = 0;
+		while(_g < myPlanets.length) {
+			var source = myPlanets[_g];
+			++_g;
+			var _g2 = 0, _g1 = source.population - 1;
+			while(_g2 < _g1) {
+				var i = _g2++;
+				toSend[Std.random(enemyPlanets.length)] += 1;
+			}
+			var _g2 = 0, _g1 = toSend.length;
+			while(_g2 < _g1) {
+				var i = _g2++;
+				if(toSend[i] != 0) orders.push(new com.tamina.planetwars.data.Order(source.id,enemyPlanets[i].id,toSend[i]));
+			}
+		}
+		return orders;
+	}
+	,__class__: strategy.Random
 }
 strategy.Spread = function(ia) {
 	this.ia = ia;
@@ -637,6 +881,7 @@ strategy.Spread.prototype = {
 		}
 		return orders;
 	}
+	,__class__: strategy.Spread
 }
 strategy.StraightToCore = function(ia,percentage) {
 	if(percentage == null) percentage = 100;
@@ -663,6 +908,7 @@ strategy.StraightToCore.prototype = {
 		}
 		return result;
 	}
+	,__class__: strategy.StraightToCore
 }
 if(Array.prototype.indexOf) HxOverrides.remove = function(a,o) {
 	var i = a.indexOf(o);
@@ -681,8 +927,18 @@ Math.isNaN = function(i) {
 	return isNaN(i);
 };
 onmessage = WorkerIA.prototype.messageHandler;
+String.prototype.__class__ = String;
 String.__name__ = true;
+Array.prototype.__class__ = Array;
 Array.__name__ = true;
+var Int = { __name__ : ["Int"]};
+var Dynamic = { __name__ : ["Dynamic"]};
+var Float = Number;
+Float.__name__ = ["Float"];
+var Bool = Boolean;
+Bool.__ename__ = ["Bool"];
+var Class = { __name__ : ["Class"]};
+var Enum = { };
 com.tamina.planetwars.data.Game.DEFAULT_PLAYER_POPULATION = 100;
 com.tamina.planetwars.data.Game.PLANET_GROWTH = 5;
 com.tamina.planetwars.data.Game.SHIP_SPEED = 60;
@@ -710,5 +966,6 @@ com.tamina.planetwars.data.PlanetSize.SMALL_EXTENSION = "_small";
 com.tamina.planetwars.data.PlanetSize.NORMAL_EXTENSION = "_normal";
 com.tamina.planetwars.data.PlanetSize.BIG_EXTENSION = "_big";
 com.tamina.planetwars.data.PlanetSize.HUGE_EXTENSION = "_huge";
+haxe.ds.ObjectMap.count = 0;
 MyIA.main();
 })();
